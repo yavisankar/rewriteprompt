@@ -1,0 +1,9 @@
+flask>=2.3.0
+numpy>=1.24.0
+scikit-learn>=1.3.0
+
+# Stage 2 — Sentence-BERT embeddings (recommended)
+sentence-transformers>=2.2.0
+
+# Stage 3 — Vector DB (recommended, falls back to NumPy if absent)
+chromadb>=0.4.0

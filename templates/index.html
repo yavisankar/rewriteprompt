@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Enron Email Intelligence Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ── Reset & Variables ─────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+:root {
+  --bg:       #0d0f14;
+  --surface:  #141720;
+  --surface2: #1c2030;
+  --border:   #252b3b;
+  --orange:   #f4721e;
+  --orange2:  #ff9a5c;
+  --green:    #23c97d;
+  --green2:   #5de8a0;
+  --blue:     #3a9bdc;
+  --blue2:    #82caff;
+  --teal:     #1ac4c4;
+  --purple:   #c06aff;
+  --yellow:   #f5d020;
+  --text:     #e8eaf0;
+  --muted:    #7a849e;
+  --font:     'Syne', sans-serif;
+  --mono:     'IBM Plex Mono', monospace;
+}
+
+body { font-family:var(--font); background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
+
+/* ── Layout ─────────────────────────────────────────────────────────────── */
+.shell { display:grid; grid-template-columns:240px 1fr; grid-template-rows:56px 1fr; min-height:100vh; }
+header { grid-column:1/-1; background:var(--surface); border-bottom:1px solid var(--border);
+  display:flex; align-items:center; padding:0 24px; gap:16px; position:sticky; top:0; z-index:100; }
+.logo { font-size:1rem; font-weight:800; letter-spacing:-.5px; color:var(--text); }
+.logo span { color:var(--orange); }
+.header-pill { font-size:.7rem; font-family:var(--mono); padding:3px 10px; border-radius:20px;
+  background:rgba(244,114,30,.15); color:var(--orange2); border:1px solid rgba(244,114,30,.25); }
+.header-right { margin-left:auto; display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:.72rem; }
+.kb-status { display:flex; align-items:center; gap:6px; color:var(--muted); }
+.dot { width:7px; height:7px; border-radius:50%; background:#555; }
+.dot.ready { background:var(--green); box-shadow:0 0 6px var(--green); }
+
+/* ── Sidebar ─────────────────────────────────────────────────────────────── */
+.sidebar { background:var(--surface); border-right:1px solid var(--border); overflow-y:auto; padding:12px 0 20px; }
+.nav-group-label { font-size:.65rem; font-family:var(--mono); text-transform:uppercase;
+  letter-spacing:1.5px; color:var(--muted); padding:16px 16px 5px; }
+.nav-item { display:flex; align-items:center; gap:9px; padding:9px 16px;
+  color:#9aa5bc; font-size:.83rem; cursor:pointer; border-left:3px solid transparent;
+  transition:all .12s; user-select:none; }
+.nav-item:hover { color:var(--text); background:var(--surface2); }
+.nav-item.active { color:var(--text); background:rgba(255,255,255,.04); }
+.nav-item.active.s0 { border-left-color:var(--yellow); }
+.nav-item.active.s1 { border-left-color:var(--orange); }
+.nav-item.active.s2 { border-left-color:var(--green); }
+.nav-item.active.s3 { border-left-color:var(--blue); }
+.nav-item.active.online { border-left-color:var(--purple); }
+.nav-badge { margin-left:auto; font-size:.62rem; font-family:var(--mono); padding:1px 7px;
+  border-radius:10px; font-weight:600; }
+.nb-orange { background:rgba(244,114,30,.2); color:var(--orange2); }
+.nb-green  { background:rgba(35,201,125,.2); color:var(--green2); }
+.nb-blue   { background:rgba(58,155,220,.2); color:var(--blue2); }
+.nb-purple { background:rgba(192,106,255,.2); color:var(--purple); }
+.sidebar-divider { height:1px; background:var(--border); margin:10px 16px; }
+
+/* ── Main content ────────────────────────────────────────────────────────── */
+.main { overflow-y:auto; padding:28px 32px; }
+.page { display:none; }
+.page.active { display:block; animation:fadeIn .2s ease; }
+@keyframes fadeIn { from {opacity:0;transform:translateY(6px)} to {opacity:1;transform:none} }
+
+/* ── Page header ─────────────────────────────────────────────────────────── */
+.page-header { margin-bottom:24px; }
+.page-header h2 { font-size:1.4rem; font-weight:800; display:flex; align-items:center; gap:10px; }
+.page-header p { color:var(--muted); font-size:.85rem; margin-top:4px; font-family:var(--mono); }
+
+/* ── Cards ───────────────────────────────────────────────────────────────── */
+.card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:20px; margin-bottom:16px; }
+.card-title { font-size:.82rem; font-weight:700; color:var(--muted); text-transform:uppercase;
+  letter-spacing:.8px; margin-bottom:14px; font-family:var(--mono); }
+
+/* ── Stat grid ───────────────────────────────────────────────────────────── */
+.stat-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px; margin-bottom:16px; }
+.stat { background:var(--surface2); border:1px solid var(--border); border-radius:8px;
+  padding:14px 16px; }
+.stat-num { font-size:1.9rem; font-weight:800; font-family:var(--mono); line-height:1; }
+.stat-lbl { font-size:.68rem; color:var(--muted); margin-top:4px; text-transform:uppercase; letter-spacing:.7px; }
+.c-orange { color:var(--orange); } .c-green { color:var(--green); }
+.c-blue   { color:var(--blue);   } .c-purple{ color:var(--purple);}
+.c-teal   { color:var(--teal);   } .c-yellow{ color:var(--yellow);}
+
+/* ── Pipeline flow bar ───────────────────────────────────────────────────── */
+.flow-bar { display:flex; align-items:center; gap:0; margin-bottom:20px; border:1px solid var(--border);
+  border-radius:8px; overflow:hidden; }
+.flow-step { flex:1; padding:9px 8px; text-align:center; font-size:.68rem; font-family:var(--mono);
+  font-weight:600; border-right:1px solid var(--border); background:var(--surface2); color:var(--muted); }
+.flow-step:last-child { border-right:none; }
+.flow-step.fs1 { color:var(--orange); background:rgba(244,114,30,.08); }
+.flow-step.fs2 { color:var(--green);  background:rgba(35,201,125,.08); }
+.flow-step.fs3 { color:var(--blue);   background:rgba(58,155,220,.08); }
+.flow-step.fso { color:var(--purple); background:rgba(192,106,255,.08); }
+
+/* ── Forms ───────────────────────────────────────────────────────────────── */
+label { font-size:.74rem; font-weight:600; color:var(--muted); display:block; margin-bottom:5px; font-family:var(--mono); }
+input[type=text], input[type=number], input[type=password], textarea {
+  width:100%; padding:9px 12px; background:var(--surface2); border:1px solid var(--border);
+  border-radius:6px; color:var(--text); font-size:.86rem; font-family:var(--font); margin-bottom:14px;
+  transition:border .15s; }
+input:focus, textarea:focus { outline:none; border-color:var(--blue); background:#1a2035; }
+textarea { resize:vertical; min-height:90px; }
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+.btn { padding:9px 20px; border-radius:7px; font-size:.84rem; font-weight:700;
+  cursor:pointer; border:none; transition:all .15s; font-family:var(--font); }
+.btn:hover { filter:brightness(1.12); }
+.btn:disabled { opacity:.35; cursor:not-allowed; }
+.btn-orange { background:var(--orange); color:#fff; }
+.btn-green  { background:var(--green);  color:#0d1a10; }
+.btn-blue   { background:var(--blue);   color:#fff; }
+.btn-purple { background:var(--purple); color:#fff; }
+.btn-ghost  { background:transparent; border:1px solid var(--border); color:var(--muted); }
+.btn-full   { width:100%; }
+.btn-sm     { padding:6px 14px; font-size:.78rem; }
+
+/* ── Log box ─────────────────────────────────────────────────────────────── */
+.log-box { background:#090c14; border:1px solid var(--border); color:#9ab; font-family:var(--mono);
+  font-size:.75rem; padding:14px; border-radius:8px; max-height:280px; overflow-y:auto;
+  white-space:pre-wrap; line-height:1.7; }
+.log-box.ok  { border-left:3px solid var(--green); }
+.log-box.err { border-left:3px solid #ef4444; }
+
+/* ── Step list (pipeline runner) ─────────────────────────────────────────── */
+.step-list { list-style:none; }
+.step-list li { padding:10px 14px; border-left:3px solid var(--border); margin-bottom:8px;
+  font-size:.84rem; border-radius:0 7px 7px 0; background:var(--surface2);
+  display:flex; align-items:center; gap:8px; transition:all .2s; }
+.step-list li.done  { border-left-color:var(--green);  background:rgba(35,201,125,.07); color:var(--green2); }
+.step-list li.err   { border-left-color:#ef4444; background:rgba(239,68,68,.07); color:#fca5a5; }
+.step-list li.run   { border-left-color:var(--yellow); background:rgba(245,208,32,.07); color:var(--yellow); }
+
+/* ── Spinner ─────────────────────────────────────────────────────────────── */
+.spin { display:inline-block; width:13px; height:13px; border:2px solid currentColor;
+  border-top-color:transparent; border-radius:50%; animation:sp .65s linear infinite; flex-shrink:0; }
+@keyframes sp { to { transform:rotate(360deg); } }
+
+/* ── Score bars ──────────────────────────────────────────────────────────── */
+.score-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.score-item { background:var(--surface2); border-radius:8px; padding:12px 14px; }
+.score-label { font-size:.72rem; color:var(--muted); font-family:var(--mono); margin-bottom:6px; }
+.score-val { font-size:1.3rem; font-weight:800; font-family:var(--mono); }
+.score-bar-wrap { background:#1a2035; border-radius:4px; height:5px; margin-top:6px; }
+.score-bar { height:5px; border-radius:4px; transition:width .6s; }
+
+/* ── Generated output box ────────────────────────────────────────────────── */
+.output-box { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:20px;
+  font-size:.9rem; line-height:1.75; white-space:pre-wrap; border-left:3px solid var(--purple); }
+
+/* ── Pipeline trace ──────────────────────────────────────────────────────── */
+.trace-step { background:var(--surface2); border:1px solid var(--border); border-radius:8px;
+  padding:12px 14px; margin-bottom:8px; }
+.trace-step-header { font-size:.75rem; font-family:var(--mono); color:var(--purple);
+  text-transform:uppercase; letter-spacing:.5px; margin-bottom:6px; }
+.trace-body { font-family:var(--mono); font-size:.73rem; color:#7ec8e3; white-space:pre-wrap; }
+
+/* ── Tag pills ───────────────────────────────────────────────────────────── */
+.tag-row { display:flex; gap:7px; flex-wrap:wrap; }
+.tag { padding:3px 10px; border-radius:12px; font-size:.7rem; font-weight:700; font-family:var(--mono); }
+.t-intent  { background:rgba(245,208,32,.15);  color:var(--yellow); }
+.t-tone    { background:rgba(192,106,255,.15); color:var(--purple); }
+.t-style   { background:rgba(35,201,125,.15);  color:var(--green2); }
+.t-score   { background:rgba(58,155,220,.15);  color:var(--blue2); }
+
+/* ── Search results ──────────────────────────────────────────────────────── */
+.hit { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:14px; margin-bottom:10px; }
+.hit-rank { font-size:.68rem; font-family:var(--mono); color:var(--blue2); margin-bottom:6px; }
+.hit-snippet { font-size:.83rem; color:var(--text); margin-bottom:8px; line-height:1.55; }
+
+/* ── Attempts history ────────────────────────────────────────────────────── */
+.attempt-row { display:flex; align-items:center; gap:10px; padding:8px 0;
+  border-bottom:1px solid var(--border); font-family:var(--mono); font-size:.75rem; }
+.attempt-row:last-child { border-bottom:none; }
+
+/* ── Memory table ────────────────────────────────────────────────────────── */
+.mem-row { background:var(--surface2); border:1px solid var(--border); border-radius:8px;
+  padding:12px 14px; margin-bottom:8px; }
+.mem-meta { font-size:.7rem; font-family:var(--mono); color:var(--muted); margin-bottom:5px; }
+.mem-prompt { font-size:.82rem; color:var(--text); margin-bottom:4px; }
+.mem-score { font-size:.72rem; font-family:var(--mono); color:var(--green); }
+
+/* ── Scrollbar ───────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width:5px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ══ HEADER ══════════════════════════════════════════════════════════════ -->
+<header>
+  <div class="logo">ENRON <span>EMAIL</span> INTELLIGENCE</div>
+  <div class="header-pill">Offline + Online RAG Pipeline</div>
+  <div class="header-right">
+    <div class="kb-status">
+      <div class="dot" id="kb-dot"></div>
+      <span id="kb-label">Knowledge Base: checking…</span>
+    </div>
+    <div class="kb-status" style="margin-left:10px">
+      <div class="dot" id="mem-dot" style="background:var(--blue)"></div>
+      <span id="mem-label">Memory: 0</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══ SIDEBAR ═════════════════════════════════════════════════════════════ -->
+<nav class="sidebar">
+  <div class="nav-group-label">Overview</div>
+  <div class="nav-item s0 active" onclick="show('dashboard')">🏠 Dashboard</div>
+
+  <div class="sidebar-divider"></div>
+  <div class="nav-group-label">⬛ Offline — Stage 1</div>
+  <div class="nav-item s1" onclick="show('s1-load')">📂 Load Dataset <span class="nav-badge nb-orange">S1</span></div>
+  <div class="nav-item s1" onclick="show('s1-norm')">🧹 Normalize Text <span class="nav-badge nb-orange">S1</span></div>
+  <div class="nav-item s1" onclick="show('s1-ann')">🏷️ Annotate <span class="nav-badge nb-orange">S1</span></div>
+  <div class="nav-item s1" onclick="show('s1-qual')">✅ Quality Check <span class="nav-badge nb-orange">S1</span></div>
+
+  <div class="sidebar-divider"></div>
+  <div class="nav-group-label">⬛ Offline — Stage 2</div>
+  <div class="nav-item s2" onclick="show('s2-cf')">🔍 Content Filter <span class="nav-badge nb-green">S2</span></div>
+  <div class="nav-item s2" onclick="show('s2-emb')">🧠 Embeddings <span class="nav-badge nb-green">S2</span></div>
+  <div class="nav-item s2" onclick="show('s2-val')">🔬 Validate <span class="nav-badge nb-green">S2</span></div>
+
+  <div class="sidebar-divider"></div>
+  <div class="nav-group-label">⬛ Offline — Stage 3</div>
+  <div class="nav-item s3" onclick="show('s3-store')">💾 Store in VectorDB <span class="nav-badge nb-blue">S3</span></div>
+  <div class="nav-item s3" onclick="show('s3-search')">🔎 KB Search <span class="nav-badge nb-blue">S3</span></div>
+  <div class="nav-item s3" onclick="show('run-offline')">▶ Run Full Offline <span class="nav-badge nb-blue">Run</span></div>
+
+  <div class="sidebar-divider"></div>
+  <div class="nav-group-label">🟣 Online — RAG Generation</div>
+  <div class="nav-item online" onclick="show('online-gen')">✉️ Generate Email <span class="nav-badge nb-purple">LLM</span></div>
+  <div class="nav-item online" onclick="show('online-mem')">🧠 Memory Store <span class="nav-badge nb-purple">MEM</span></div>
+
+  <div class="sidebar-divider"></div>
+  <div class="nav-group-label">Logs</div>
+  <div class="nav-item" onclick="show('logs')">📋 Logs</div>
+</nav>
+
+<!-- ══ MAIN ═════════════════════════════════════════════════════════════════ -->
+<main class="main">
+
+<!-- ─── DASHBOARD ────────────────────────────────────────────────────────── -->
+<div id="dashboard" class="page active">
+  <div class="page-header">
+    <h2>🏠 Platform Dashboard</h2>
+    <p>Enron Email Intelligence — Offline Data Pipeline + Online RAG Generation</p>
+  </div>
+
+  <div class="flow-bar" style="margin-bottom:8px">
+    <div class="flow-step fs1">📂 Load</div>
+    <div class="flow-step fs1">🧹 Normalize</div>
+    <div class="flow-step fs1">🏷️ Annotate</div>
+    <div class="flow-step fs1">✅ Quality</div>
+    <div class="flow-step fs2">🔍 Filter</div>
+    <div class="flow-step fs2">🧠 Embed</div>
+    <div class="flow-step fs2">🔬 Validate</div>
+    <div class="flow-step fs3">💾 Store</div>
+  </div>
+  <div class="flow-bar" style="margin-bottom:20px">
+    <div class="flow-step fso">💬 Prompt</div>
+    <div class="flow-step fso">🧹 Preprocess</div>
+    <div class="flow-step fso">🎯 Intent</div>
+    <div class="flow-step fso">🔎 Retrieve</div>
+    <div class="flow-step fso">✍️ Rewrite</div>
+    <div class="flow-step fso">🤖 GPT-4o</div>
+    <div class="flow-step fso">🏆 Score</div>
+    <div class="flow-step fso">💾 Memory</div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat"><div class="stat-num c-orange" id="d-raw">—</div><div class="stat-lbl">Raw Emails</div></div>
+    <div class="stat"><div class="stat-num c-orange" id="d-valid">—</div><div class="stat-lbl">Curated Valid</div></div>
+    <div class="stat"><div class="stat-num c-orange" id="d-invalid">—</div><div class="stat-lbl">Rejected S1</div></div>
+    <div class="stat"><div class="stat-num c-green"  id="d-filtered">—</div><div class="stat-lbl">After Filter S2</div></div>
+    <div class="stat"><div class="stat-num c-green"  id="d-embeds">—</div><div class="stat-lbl">Valid Embeds</div></div>
+    <div class="stat"><div class="stat-num c-blue"   id="d-stored">—</div><div class="stat-lbl">In VectorDB</div></div>
+    <div class="stat"><div class="stat-num c-purple" id="d-memory">—</div><div class="stat-lbl">Memory Cases</div></div>
+  </div>
+  <button class="btn btn-ghost btn-sm" onclick="refreshDash()">↻ Refresh Stats</button>
+</div>
+
+<!-- ─── S1 LOAD ──────────────────────────────────────────────────────────── -->
+<div id="s1-load" class="page">
+  <div class="page-header"><h2>📂 Load Dataset</h2><p>Stage 1 · Data Curation — Load & Understand</p></div>
+  <div class="card">
+    <div class="card-title">Configuration</div>
+    <label>CSV Path (relative to app.py)</label>
+    <input type="text" id="load-csv" value="data/emails.csv">
+    <label>Row Limit</label>
+    <input type="number" id="load-lim" value="500" min="10">
+    <button class="btn btn-orange" onclick="api('/api/offline/stage1/load','POST',{csv_path:g('load-csv'),limit:parseInt(g('load-lim'))},'load-res')">Load Dataset</button>
+  </div>
+  <div id="load-res"></div>
+</div>
+
+<!-- ─── S1 NORMALIZE ─────────────────────────────────────────────────────── -->
+<div id="s1-norm" class="page">
+  <div class="page-header"><h2>🧹 Text Normalization</h2><p>Stage 1 · Clean & standardise — remove URLs, headers, noise</p></div>
+  <div class="card">
+    <button class="btn btn-orange" onclick="api('/api/offline/stage1/normalize','POST',{},'norm-res')">Run Normalization</button>
+  </div>
+  <div id="norm-res"></div>
+</div>
+
+<!-- ─── S1 ANNOTATE ──────────────────────────────────────────────────────── -->
+<div id="s1-ann" class="page">
+  <div class="page-header"><h2>🏷️ Semantic Annotation</h2><p>Stage 1 · Intent labelling · Tone identification · Style categorization</p></div>
+  <div class="card">
+    <button class="btn btn-orange" onclick="api('/api/offline/stage1/annotate','POST',{},'ann-res')">Run Annotation</button>
+  </div>
+  <div id="ann-res"></div>
+</div>
+
+<!-- ─── S1 QUALITY ───────────────────────────────────────────────────────── -->
+<div id="s1-qual" class="page">
+  <div class="page-header"><h2>✅ Quality Check & Filter</h2><p>Stage 1 · Remove empty, short, duplicate, noisy emails</p></div>
+  <div class="card">
+    <button class="btn btn-orange" onclick="api('/api/offline/stage1/quality_check','POST',{},'qual-res')">Run Quality Check</button>
+  </div>
+  <div id="qual-res"></div>
+</div>
+
+<!-- ─── S2 CONTENT FILTER ────────────────────────────────────────────────── -->
+<div id="s2-cf" class="page">
+  <div class="page-header"><h2>🔍 Content Filtering</h2><p>Stage 2 · Remove auto-replies, bounces, ads — ensure quality dataset</p></div>
+  <div class="card">
+    <button class="btn btn-green" onclick="api('/api/offline/stage2/content_filter','POST',{},'cf-res')">Run Content Filter</button>
+  </div>
+  <div id="cf-res"></div>
+</div>
+
+<!-- ─── S2 EMBEDDINGS ────────────────────────────────────────────────────── -->
+<div id="s2-emb" class="page">
+  <div class="page-header"><h2>🧠 Generate Embeddings</h2><p>Stage 2 · Sentence-BERT (all-MiniLM-L6-v2) — text → dense vectors</p></div>
+  <div class="card">
+    <div style="background:rgba(245,208,32,.08);border:1px solid rgba(245,208,32,.2);border-radius:7px;padding:11px 14px;margin-bottom:14px;font-size:.82rem;color:var(--yellow)">
+      ⚠️ This step may take 1–5 minutes depending on dataset size.
+    </div>
+    <button class="btn btn-green" onclick="api('/api/offline/stage2/generate_embeddings','POST',{},'emb-res',180000)">Generate Embeddings</button>
+  </div>
+  <div id="emb-res"></div>
+</div>
+
+<!-- ─── S2 VALIDATE ──────────────────────────────────────────────────────── -->
+<div id="s2-val" class="page">
+  <div class="page-header"><h2>🔬 Validate Embeddings</h2><p>Stage 2 · Zero-vector · Low-variance · NaN/Inf checks</p></div>
+  <div class="card">
+    <button class="btn btn-green" onclick="api('/api/offline/stage2/validate_embeddings','POST',{},'val-res')">Validate Embeddings</button>
+  </div>
+  <div id="val-res"></div>
+</div>
+
+<!-- ─── S3 STORE ─────────────────────────────────────────────────────────── -->
+<div id="s3-store" class="page">
+  <div class="page-header"><h2>💾 Store in Knowledge Base</h2><p>Stage 3 · Persist embeddings + metadata to ChromaDB (or NumPy fallback)</p></div>
+  <div class="card">
+    <button class="btn btn-blue" onclick="api('/api/offline/stage3/store','POST',{},'store-res')">Store Knowledge Base</button>
+  </div>
+  <div id="store-res"></div>
+</div>
+
+<!-- ─── S3 SEARCH ────────────────────────────────────────────────────────── -->
+<div id="s3-search" class="page">
+  <div class="page-header"><h2>🔎 Knowledge Base Search</h2><p>Stage 3 · Semantic cosine-similarity search</p></div>
+  <div class="card">
+    <label>Search Query</label>
+    <input type="text" id="search-q" placeholder="e.g. meeting about energy trading">
+    <label>Top K</label>
+    <input type="number" id="search-k" value="5" min="1" max="20">
+    <button class="btn btn-blue" onclick="runKBSearch()">Search</button>
+  </div>
+  <div id="search-res"></div>
+</div>
+
+<!-- ─── RUN OFFLINE ──────────────────────────────────────────────────────── -->
+<div id="run-offline" class="page">
+  <div class="page-header"><h2>▶ Run Full Offline Pipeline</h2><p>Execute all 3 offline stages sequentially</p></div>
+  <div class="card">
+    <label>CSV Path</label>
+    <input type="text" id="ro-csv" value="data/emails.csv">
+    <label>Email Limit</label>
+    <input type="number" id="ro-lim" value="200" min="10">
+    <button class="btn btn-orange btn-full" id="ro-btn" onclick="runOffline()">▶ Run All Stages</button>
+  </div>
+  <div class="card">
+    <ul class="step-list" id="ro-steps">
+      <li id="rs-load">📂 Load & Understand Dataset</li>
+      <li id="rs-norm">🧹 Text Normalization</li>
+      <li id="rs-ann">🏷️ Semantic Annotation</li>
+      <li id="rs-qual">✅ Quality Check & Filter</li>
+      <li id="rs-cf">🔍 Content Filtering</li>
+      <li id="rs-emb">🧠 Generate Embeddings (Sentence-BERT)</li>
+      <li id="rs-val">🔬 Validate Embeddings</li>
+      <li id="rs-store">💾 Store in Vector Knowledge Base</li>
+    </ul>
+  </div>
+  <div id="ro-result"></div>
+</div>
+
+<!-- ─── ONLINE GENERATE ──────────────────────────────────────────────────── -->
+<div id="online-gen" class="page">
+  <div class="page-header"><h2>✉️ Online Email Generation</h2><p>RAG Pipeline · Prompt → Retrieve → Rewrite → GPT-4o-mini → Score → Memory</p></div>
+
+  <!-- Flow -->
+  <div class="flow-bar" style="margin-bottom:20px">
+    <div class="flow-step fso">💬 Prompt</div>
+    <div class="flow-step fso">🧹 Clean</div>
+    <div class="flow-step fso">🎯 Intent</div>
+    <div class="flow-step fso">🔎 Retrieve</div>
+    <div class="flow-step fso">✍️ Rewrite</div>
+    <div class="flow-step fso">🤖 GPT-4o</div>
+    <div class="flow-step fso">🏆 Score</div>
+    <div class="flow-step fso">💾 Memory</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Request</div>
+    <label>OpenAI API Key</label>
+    <input type="password" id="oai-key" placeholder="sk-...">
+    <label>Your Prompt</label>
+    <textarea id="gen-prompt" rows="4" placeholder="e.g. Write a professional email to schedule a meeting with the energy trading team about Q4 forecasts"></textarea>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div>
+        <label>Score Threshold (0–1)</label>
+        <input type="number" id="gen-thresh" value="0.65" min="0" max="1" step="0.05">
+      </div>
+      <div>
+        <label>Max Retries</label>
+        <input type="number" id="gen-retries" value="2" min="0" max="5">
+      </div>
+    </div>
+    <button class="btn btn-purple btn-full" id="gen-btn" onclick="runGenerate()">✉️ Generate Email</button>
+  </div>
+
+  <!-- Results -->
+  <div id="gen-result" style="display:none">
+    <div class="card">
+      <div class="card-title">Generated Email</div>
+      <div class="output-box" id="gen-output"></div>
+      <div style="margin-top:12px">
+        <div class="tag-row" id="gen-tags"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Rewritten Prompt</div>
+      <div class="output-box" id="gen-rewrite" style="border-left-color:var(--blue);font-family:var(--mono);font-size:.8rem"></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="card">
+        <div class="card-title">Quality Scores</div>
+        <div class="score-grid" id="gen-scores"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Pipeline Info</div>
+        <div id="gen-info" style="font-family:var(--mono);font-size:.76rem;line-height:1.8;color:var(--muted)"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Retry Attempts</div>
+      <div id="gen-attempts"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Top 10 Semantic Matches (History)</div>
+      <div id="gen-matches"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Pipeline Trace</div>
+      <div id="gen-trace"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── ONLINE MEMORY ────────────────────────────────────────────────────── -->
+<div id="online-mem" class="page">
+  <div class="page-header"><h2>🧠 Memory Store</h2><p>High-quality generated emails stored for future context</p></div>
+  <div class="card" style="display:flex;gap:10px;align-items:center">
+    <button class="btn btn-ghost btn-sm" onclick="loadMemory()">↻ Refresh</button>
+    <button class="btn btn-ghost btn-sm" style="color:#ef4444;border-color:#ef4444" onclick="clearMemory()">🗑 Clear Memory</button>
+  </div>
+  <div id="mem-list"></div>
+</div>
+
+<!-- ─── LOGS ─────────────────────────────────────────────────────────────── -->
+<div id="logs" class="page">
+  <div class="page-header"><h2>📋 Logs</h2><p>Invalid data & failed embedding logs from offline pipeline</p></div>
+  <div class="card" style="display:flex;gap:10px">
+    <button class="btn btn-ghost btn-sm" onclick="loadLog('valid_data','log-valid')">Load Valid Data</button>
+    <button class="btn btn-ghost btn-sm" onclick="loadLog('invalid_data','log-inv')">Load Invalid Data</button>
+    <button class="btn btn-ghost btn-sm" onclick="loadLog('failed_embeddings','log-fail')">Load Failed Embeddings</button>
+  </div>
+  <div id="log-valid"></div>
+  <div id="log-inv"></div>
+  <div id="log-fail"></div>
+</div>
+
+</main>
+</div><!-- /shell -->
+
+<script>
+// ── Helpers ───────────────────────────────────────────────────────────────
+const g = id => document.getElementById(id)?.value ?? '';
+const el = id => document.getElementById(id);
+
+function show(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el(page).classList.add('active');
+  // Highlight nav
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick')?.includes(page)) n.classList.add('active');
+  });
+}
+
+function renderLog(containerId, data, isErr) {
+  let displayData = data;
+  if (data && typeof data === 'object' && !Array.isArray(data) && data.first_record_behavior) {
+    displayData = {...data};
+    delete displayData.first_record_behavior;
+  }
+  const box = document.createElement('div');
+  box.className = 'card';
+  box.innerHTML = `<div class="log-box ${isErr?'err':'ok'}">${JSON.stringify(displayData,null,2)}</div>`;
+  el(containerId).innerHTML = '';
+  el(containerId).appendChild(box);
+}
+
+function buildFirstRecordPreview(payload) {
+  if (!payload || typeof payload !== 'object') return null;
+
+  if (payload.first_record_behavior) {
+    return payload.first_record_behavior;
+  }
+
+  // Common API shape: {status, data}
+  if (payload.data && typeof payload.data === 'object') {
+    const d = payload.data;
+    if (Array.isArray(d.results) && d.results.length) {
+      return {source:'data.results[0]', first_record:d.results[0]};
+    }
+    if (Array.isArray(d) && d.length) {
+      return {source:'data[0]', first_record:d[0]};
+    }
+    return {source:'data', first_record:d};
+  }
+
+  // Raw array payload (memory/log endpoints)
+  if (Array.isArray(payload) && payload.length) {
+    return {source:'response[0]', first_record:payload[0]};
+  }
+
+  // Pipeline run shape: {status, report}
+  if (payload.report && typeof payload.report === 'object') {
+    return {source:'report', first_record:payload.report};
+  }
+
+  return null;
+}
+
+function renderFirstRecord(containerId, payload) {
+  const preview = buildFirstRecordPreview(payload);
+  if (!preview) return;
+  const wrap = document.createElement('div');
+  wrap.className = 'card';
+  wrap.innerHTML = `
+    <div class="card-title">First Record / Behavior (JSON)</div>
+    <div class="log-box ok">${JSON.stringify(preview,null,2)}</div>
+  `;
+  el(containerId).appendChild(wrap);
+}
+
+async function api(url, method, body, resultId, timeout=45000) {
+  el(resultId).innerHTML = `<div class="card"><div class="log-box"><span class="spin"></span> Processing…</div></div>`;
+  try {
+    const ctrl = new AbortController();
+    const tid  = setTimeout(() => ctrl.abort(), timeout);
+    const r    = await fetch(url, {
+      method, signal: ctrl.signal,
+      headers: {'Content-Type':'application/json'},
+      body: method==='POST' ? JSON.stringify(body) : undefined,
+    });
+    clearTimeout(tid);
+    const data = await r.json();
+    renderLog(resultId, data, !r.ok);
+    if (r.ok) renderFirstRecord(resultId, data);
+    refreshDash();
+  } catch(e) {
+    renderLog(resultId, {error: e.message}, true);
+  }
+}
+
+// ── Dashboard ─────────────────────────────────────────────────────────────
+async function refreshDash() {
+  try {
+    const [s1, s2, s3, on] = await Promise.all([
+      fetch('/api/offline/stage1/status').then(r=>r.json()),
+      fetch('/api/offline/stage2/status').then(r=>r.json()),
+      fetch('/api/offline/stage3/stats').then(r=>r.json()),
+      fetch('/api/online/status').then(r=>r.json()),
+    ]);
+    el('d-raw').textContent      = s1.raw_count      || '—';
+    el('d-valid').textContent    = s1.valid_count     || '—';
+    el('d-invalid').textContent  = s1.invalid_count   || '—';
+    el('d-filtered').textContent = s2.filtered_count  || '—';
+    el('d-embeds').textContent   = s2.valid_embeddings|| '—';
+    el('d-stored').textContent   = s3.stored_vectors  || '—';
+    el('d-memory').textContent   = on.memory_count    || '0';
+    const ready = s3.collection_ready;
+    el('kb-dot').className   = 'dot' + (ready ? ' ready' : '');
+    el('kb-label').textContent = 'KB: ' + (ready ? `${s3.stored_vectors} vectors ready` : 'Not built');
+    el('mem-label').textContent= `Memory: ${on.memory_count||0}`;
+  } catch {}
+}
+
+// ── Offline Full Run ──────────────────────────────────────────────────────
+const STEPS_IDS  = ['load','norm','ann','qual','cf','emb','val','store'];
+const STEPS_APIS = [
+  () => fetch('/api/offline/stage1/load',       {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({csv_path:g('ro-csv'),limit:parseInt(g('ro-lim'))})}),
+  () => fetch('/api/offline/stage1/normalize',  {method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}),
+  () => fetch('/api/offline/stage1/annotate',   {method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}),
+  () => fetch('/api/offline/stage1/quality_check',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}),
+  () => fetch('/api/offline/stage2/content_filter',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}),
+  () => fetch('/api/offline/stage2/generate_embeddings',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}),
+  () => fetch('/api/offline/stage2/validate_embeddings',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}),
+  () => fetch('/api/offline/stage3/store',      {method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}),
+];
+
+async function runOffline() {
+  const btn = el('ro-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> Running…';
+  STEPS_IDS.forEach(s => { const li = el('rs-'+s); li.className=''; });
+
+  for (let i=0; i<STEPS_IDS.length; i++) {
+    const li = el('rs-'+STEPS_IDS[i]);
+    li.classList.add('run');
+    li.innerHTML = li.innerHTML.replace(/<span.*?<\/span>/g,'') + ' <span class="spin"></span>';
+    try {
+      const r    = await STEPS_APIS[i]();
+      const data = await r.json();
+      li.classList.remove('run');
+      li.classList.add(r.ok ? 'done' : 'err');
+      li.innerHTML = li.innerHTML.replace(/<span.*?<\/span>/g,'') + (r.ok ? ' ✓' : ' ✗ '+(data.message||''));
+      if (!r.ok) break;
+      refreshDash();
+    } catch(e) {
+      li.classList.remove('run');
+      li.classList.add('err');
+      li.innerHTML += ' ✗ ' + e.message;
+      break;
+    }
+  }
+  el('ro-result').innerHTML = `<div class="card"><div class="log-box ok">Offline pipeline run complete. Check Dashboard for stats.</div></div>`;
+  btn.disabled = false;
+  btn.innerHTML = '▶ Run All Stages';
+  refreshDash();
+}
+
+// ── KB Search ─────────────────────────────────────────────────────────────
+async function runKBSearch() {
+  const query = g('search-q');
+  const topK  = parseInt(g('search-k'));
+  const res   = el('search-res');
+  if (!query) { res.innerHTML='<p style="color:var(--orange)">Enter a query.</p>'; return; }
+  res.innerHTML = `<div class="card"><div class="log-box"><span class="spin"></span> Searching…</div></div>`;
+  try {
+    const r    = await fetch('/api/offline/stage3/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query,top_k:topK})});
+    const data = await r.json();
+    if (!r.ok || !data.data) { renderLog('search-res',data,true); return; }
+    const hits = data.data.results||[];
+    if (!hits.length) { res.innerHTML='<p>No results found.</p>'; return; }
+    res.innerHTML = `<p style="font-family:var(--mono);font-size:.74rem;color:var(--muted);margin-bottom:12px">
+      ${hits.length} results · DB: ${data.data.db}</p>` +
+      hits.map(h=>`<div class="hit">
+        <div class="hit-rank">#${h.rank} · score: ${h.score??'—'} · ${h.id}</div>
+        <div class="hit-snippet">${h.snippet||''}</div>
+        <div class="tag-row">
+          <span class="tag t-intent">${h.metadata?.intent||'—'}</span>
+          <span class="tag t-tone">${h.metadata?.tone||'—'}</span>
+          <span class="tag t-style">${h.metadata?.style||'—'}</span>
+        </div></div>`).join('');
+    renderFirstRecord('search-res', data);
+  } catch(e) { renderLog('search-res',{error:e.message},true); }
+}
+
+// ── Online Generate ───────────────────────────────────────────────────────
+async function runGenerate() {
+  const prompt   = g('gen-prompt');
+  const apiKey   = g('oai-key');
+  const threshold= parseFloat(g('gen-thresh'));
+  const retries  = parseInt(g('gen-retries'));
+  const btn      = el('gen-btn');
+
+  if (!prompt) { alert('Enter a prompt.'); return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin"></span> Generating…';
+  el('gen-result').style.display = 'none';
+
+  try {
+    const r = await fetch('/api/online/generate', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({prompt, openai_api_key:apiKey, score_threshold:threshold, max_retries:retries}),
+    });
+    const data = await r.json();
+
+    if (!r.ok) {
+      el('gen-result').style.display='block';
+      el('gen-output').textContent = '❌ Error: ' + (data.message||JSON.stringify(data));
+      btn.disabled=false; btn.innerHTML='✉️ Generate Email';
+      return;
+    }
+
+    // Show result
+    el('gen-result').style.display='block';
+    el('gen-output').textContent = data.final_output;
+    const rewrittenPrompt = data.pipeline_trace?.find(t=>t.step==='prompt_rewrite')?.output?.rewritten_prompt || '';
+    el('gen-rewrite').textContent = rewrittenPrompt || 'No rewritten prompt available.';
+
+    // Tags
+    const ic = data.intent_context||{};
+    el('gen-tags').innerHTML = `
+      <span class="tag t-intent">intent: ${ic.intent||'—'}</span>
+      <span class="tag t-tone">tone: ${ic.tone||'—'}</span>
+      <span class="tag t-style">style: ${ic.style||'—'}</span>
+      <span class="tag t-score">attempts: ${data.attempts||1}</span>
+      <span class="tag t-score">${data.fallback_used?'⚠️ fallback':'✅ RAG context'}</span>`;
+
+    // Scores
+    const sc = data.scores||{};
+    const scoreItems = [
+      {lbl:'Relevance',val:sc.relevance_score,col:'var(--orange)'},
+      {lbl:'Tone Match',val:sc.tone_match_score,col:'var(--purple)'},
+      {lbl:'Semantic Sim',val:sc.semantic_similarity,col:'var(--blue)'},
+      {lbl:'Composite',val:sc.composite,col:sc.composite>=threshold?'var(--green)':'#ef4444'},
+    ];
+    el('gen-scores').innerHTML = scoreItems.map(s=>`
+      <div class="score-item">
+        <div class="score-label">${s.lbl}</div>
+        <div class="score-val" style="color:${s.col}">${((s.val||0)*100).toFixed(0)}%</div>
+        <div class="score-bar-wrap"><div class="score-bar" style="width:${((s.val||0)*100).toFixed(1)}%;background:${s.col}"></div></div>
+      </div>`).join('');
+
+    // Info
+    el('gen-info').innerHTML = `
+      <span style="color:var(--text)">Model:</span>        gpt-4o-mini<br>
+      <span style="color:var(--text)">Retrieved:</span>    ${data.retrieved_count||0} examples<br>
+      <span style="color:var(--text)">Fallback:</span>     ${data.fallback_used?'Yes (No good context)':'No'}<br>
+      <span style="color:var(--text)">Attempts:</span>     ${data.attempts||1}<br>
+      <span style="color:var(--text)">Threshold:</span>    ${threshold}<br>
+      <span style="color:var(--text)">Passed:</span>       <span style="color:${sc.composite>=threshold?'var(--green)':'#ef4444'}">${sc.composite>=threshold?'Yes ✓':'No ✗'}</span>`;
+
+    // Retry attempts
+    const retryHist = data.pipeline_trace?.find(t=>t.step==='generate_score_loop')?.output?.retry_history||[];
+    el('gen-attempts').innerHTML = retryHist.length ? retryHist.map(a=>`
+      <div class="attempt-row">
+        <span style="color:var(--muted)">Attempt ${a.attempt}</span>
+        <span class="tag t-score">score: ${((a.score||0)*100).toFixed(0)}%</span>
+        <span style="color:var(--muted);flex:1;white-space:pre-wrap;word-break:break-word">${a.text_snippet||''}</span>
+      </div>`).join('') : '<span style="color:var(--muted);font-size:.8rem">Passed on first attempt.</span>';
+
+    // Top semantic matches from KB history
+    const matches = data.semantic_matches_top10 || [];
+    el('gen-matches').innerHTML = matches.length ? matches.map(h=>`
+      <div class="hit">
+        <div class="hit-rank">#${h.rank ?? '-'} · score: ${h.score ?? '—'} · ${h.id ?? '—'}</div>
+        <div class="hit-snippet">${h.snippet||''}</div>
+        <div class="tag-row">
+          <span class="tag t-intent">${h.metadata?.intent||'—'}</span>
+          <span class="tag t-tone">${h.metadata?.tone||'—'}</span>
+          <span class="tag t-style">${h.metadata?.style||'—'}</span>
+        </div>
+      </div>`).join('') : '<span style="color:var(--muted);font-size:.8rem">No semantic matches available.</span>';
+
+    // Pipeline trace
+    el('gen-trace').innerHTML = (data.pipeline_trace||[]).map(t=>`
+      <div class="trace-step">
+        <div class="trace-step-header">${t.step}</div>
+        <div class="trace-body">${JSON.stringify(t.output,null,2)}</div>
+      </div>`).join('');
+
+    const firstBehavior = data.first_record_behavior || {
+      stage: 'online_generate',
+      user_prompt: prompt,
+      first_generated_text: data.final_output || '',
+      scores: data.scores || null
+    };
+    const behaviorCard = document.createElement('div');
+    behaviorCard.className = 'card';
+    behaviorCard.innerHTML = `
+      <div class="card-title">First Record / Behavior (JSON)</div>
+      <div class="log-box ok">${JSON.stringify(firstBehavior,null,2)}</div>
+    `;
+    el('gen-trace').appendChild(behaviorCard);
+
+    refreshDash();
+  } catch(e) {
+    el('gen-result').style.display='block';
+    el('gen-output').textContent = '❌ Network error: ' + e.message;
+  }
+  btn.disabled=false; btn.innerHTML='✉️ Generate Email';
+}
+
+// ── Memory ────────────────────────────────────────────────────────────────
+async function loadMemory() {
+  const r    = await fetch('/api/online/memory');
+  const data = await r.json();
+  const wrap = el('mem-list');
+  if (!data.length) { wrap.innerHTML='<p style="color:var(--muted);font-size:.85rem">No memory yet. Generate some emails first.</p>'; return; }
+  wrap.innerHTML = data.map(m=>`
+    <div class="mem-row">
+      <div class="mem-meta">${m.id} · ${m.timestamp||''}</div>
+      <div class="mem-prompt">${m.prompt||''}</div>
+      <div class="tag-row" style="margin:6px 0">
+        <span class="tag t-intent">${m.intent||''}</span>
+        <span class="tag t-tone">${m.tone||''}</span>
+        <span class="mem-score">score: ${((m.score||0)*100).toFixed(0)}%</span>
+      </div>
+      <div style="font-size:.78rem;color:var(--muted);margin-top:4px;white-space:pre-wrap;word-break:break-word">${m.output||''}</div>
+    </div>`).join('');
+}
+
+async function clearMemory() {
+  if (!confirm('Clear all memory?')) return;
+  await fetch('/api/online/memory/clear',{method:'POST'});
+  loadMemory(); refreshDash();
+}
+
+// ── Logs ──────────────────────────────────────────────────────────────────
+async function loadLog(type, targetId) {
+  const r    = await fetch(`/api/logs/${type}`);
+  const data = await r.json();
+  if (!data.length) { el(targetId).innerHTML=`<p style="color:var(--muted);font-size:.82rem;margin-top:8px">No ${type} logs yet.</p>`; return; }
+  renderLog(targetId, data, false);
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────
+refreshDash();
+</script>
+</body>
+</html>

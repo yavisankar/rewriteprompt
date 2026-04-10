@@ -1,0 +1,146 @@
+[
+  {
+    "id": "f5ab53d2",
+    "timestamp": "2026-04-09T22:07:11.698537",
+    "prompt": "Draft an urgent escalation email for API outage",
+    "intent": "compose",
+    "tone": "urgent",
+    "output": "Subject: Urgent: API Outage Notification\n\nDear Team,\n\nI am writing to inform you of a critical API outage that is currently affecting our services. We have identified the issue and are actively working on a resolution. However, it is imperative that we escalate this matter to ensure minimal disruption to our operations.\n\nPlease prioritize any tasks related to this outage and provide updates on progress every hour. Additionally, I urge all teams to communicate any dependencies that may be impacted during this downtime.\n\nWe appreciate your immediate attention to this matter and will keep you updated as we work towards a resolution.\n\nBest regards,\n\n[Your Name]  \n[Your Position]  \n[Your Contact Information]",
+    "score": 0.6901
+  },
+  {
+    "id": "3322cdb9",
+    "timestamp": "2026-04-09T22:05:49.125514",
+    "prompt": "Write a friendly update to team on successful deployment",
+    "intent": "compose",
+    "tone": "informal",
+    "output": "Subject: Great News \u2013 Successful Deployment!\n\nHi Team,\n\nI hope this message finds you well! I\u2019m excited to share that we\u2019ve successfully completed our deployment! \ud83c\udf89 \n\nThanks to each of you for your hard work and dedication throughout this process. Your teamwork and commitment made a significant difference, and I couldn't be prouder of what we've accomplished together.\n\nLet\u2019s take a moment to celebrate this achievement! I\u2019d love to hear your thoughts on what went well and any lessons learned as we move forward. \n\nLooking forward to our continued success!\n\nBest,  \n[Your Name]",
+    "score": 0.7359
+  },
+  {
+    "id": "117b1b7f",
+    "timestamp": "2026-04-09T21:57:04.292733",
+    "prompt": "Write a formal follow-up email for budget approval.",
+    "intent": "compose",
+    "tone": "formal",
+    "output": "Subject: Follow-Up on Budget Approval Request\n\nDear [Recipient's Name],\n\nI hope this message finds you well. I am writing to follow up on the budget approval request submitted on [insert date]. As we are moving forward with our planning, your timely approval would be greatly appreciated.\n\nIf you require any additional information or documentation to assist in the decision-making process, please do not hesitate to reach out. I am happy to provide whatever is needed.\n\nThank you for your attention to this matter. I look forward to your prompt response.\n\nBest regards,\n\n[Your Name]  \n[Your Position]  \n[Your Company]  \n[Your Contact Information]",
+    "score": 0.7475
+  },
+  {
+    "id": "3c3d18ea",
+    "timestamp": "2026-04-09T21:06:52.374965",
+    "prompt": "Summarize action items from vendor pricing meeting in bullet points.",
+    "intent": "summarize",
+    "tone": "professional",
+    "output": "Subject: Summary of Action Items from Vendor Pricing Meeting\n\n- Review vendor pricing adjustments \n- Analyze supply chain impacts on pricing \n- Assess competitor pricing strategies \n- Prepare a report on customer feedback related to pricing \n- Schedule follow-up meeting to discuss findings and next steps \n- Ensure all team members have access to relevant pricing data \n\nThank you.",
+    "score": 0.7407
+  },
+  {
+    "id": "a561bb37",
+    "timestamp": "2026-04-09T21:03:20.549342",
+    "prompt": "leave request",
+    "intent": "request",
+    "tone": "professional",
+    "output": "Subject: Leave Request\n\nDear [Manager's Name],\n\nI hope this message finds you well. I am writing to formally request leave from [start date] to [end date] due to [brief reason, e.g., personal reasons, a family commitment, etc.]. \n\nI will ensure that all my responsibilities are managed prior to my absence and am happy to assist in transitioning any urgent tasks to the team. Please let me know if you need any additional information or if we can discuss this further.\n\nThank you for considering my request. I look forward to your approval.\n\nBest regards,\n\n[Your Name]  \n[Your Position]  \n[Your Contact Information]",
+    "score": 0.828
+  },
+  {
+    "id": "42f76ace",
+    "timestamp": "2026-04-09T21:02:16.444028",
+    "prompt": "Write a formal follow-up email requesting budget approval status for Q5 procurement. Keep it concise.\n",
+    "intent": "compose",
+    "tone": "formal",
+    "output": "Subject: Follow-Up on Q5 Procurement Budget Approval Status\n\nDear [Recipient's Name],\n\nI hope this message finds you well. I am writing to follow up on the status of the budget approval for Q5 procurement. Your timely response would be greatly appreciated as it will assist us in our planning and execution.\n\nThank you for your attention to this matter.\n\nBest regards,  \n[Your Name]  \n[Your Position]  \n[Your Contact Information]",
+    "score": 0.6896
+  },
+  {
+    "id": "472eefdc",
+    "timestamp": "2026-04-09T20:59:52.865179",
+    "prompt": "Write a formal follow-up email requesting budget approval status for Q5 procurement. Keep it concise.\n",
+    "intent": "compose",
+    "tone": "formal",
+    "output": "Subject: Follow-Up on Budget Approval Status for Q5 Procurement\n\nDear [Recipient's Name],\n\nI hope this message finds you well. I am writing to follow up on the status of the budget approval for Q5 procurement. Your timely update would be greatly appreciated, as it will help us proceed accordingly.\n\nThank you for your attention to this matter.\n\nBest regards,  \n[Your Name]  \n[Your Position]  \n[Your Contact Information]",
+    "score": 0.6902
+  },
+  {
+    "id": "42ca2d4f",
+    "timestamp": "2026-04-09T19:38:13.834813",
+    "prompt": "Write a formal follow-up email requesting budget approval status for Q5 procurement. Keep it concise.\n",
+    "intent": "compose",
+    "tone": "formal",
+    "output": "Subject: Follow-Up on Q5 Procurement Budget Approval\n\nDear [Recipient's Name],\n\nI hope this message finds you well. I am writing to kindly follow up on the status of the budget approval for Q5 procurement. Your timely feedback on this matter would be greatly appreciated, as it will assist us in moving forward with our planning.\n\nThank you for your attention to this request.\n\nBest regards,  \n[Your Name]  \n[Your Position]  \n[Your Company]  \n[Your Contact Information]",
+    "score": 0.6855
+  },
+  {
+    "id": "f74ac9b4",
+    "timestamp": "2026-04-09T19:34:47.662267",
+    "prompt": "Write a formal follow-up email requesting budget approval status for Q4 procurement. Keep it concise.\n",
+    "intent": "compose",
+    "tone": "formal",
+    "output": "Subject: Follow-Up on Q4 Procurement Budget Approval\n\nDear [Recipient's Name],\n\nI hope this message finds you well. I am writing to follow up on the status of the budget approval for Q4 procurement. Your timely feedback would be greatly appreciated, as it will assist us in planning our upcoming initiatives effectively.\n\nThank you for your attention to this matter.\n\nBest regards,  \n[Your Name]  \n[Your Position]  \n[Your Contact Information]",
+    "score": 0.6647
+  },
+  {
+    "id": "40fbf894",
+    "timestamp": "2026-04-09T18:22:04.714810",
+    "prompt": "Write a formal follow-up email requesting budget approval status for Q4 procurement. Keep it concise.\n\n",
+    "intent": "compose",
+    "tone": "formal",
+    "output": "Subject: Follow-Up on Q4 Procurement Budget Approval\n\nDear [Recipient's Name],\n\nI hope this message finds you well. I am writing to follow up on the status of the budget approval for Q4 procurement. Your timely response will be greatly appreciated, as it will assist us in moving forward with our planned initiatives.\n\nThank you for your attention to this matter.\n\nBest regards,  \n[Your Name]  \n[Your Position]  \n[Your Company]",
+    "score": 0.6651
+  },
+  {
+    "id": "b767a2ee",
+    "timestamp": "2026-04-09T11:51:01.569077",
+    "prompt": "write a email for leave because of fever",
+    "intent": "compose",
+    "tone": "professional",
+    "output": "Subject: Sick Leave Request\n\nDear [Manager's Name],\n\nI hope this message finds you well. I am writing to inform you that I am experiencing a fever and, unfortunately, am unable to perform my duties effectively. As a result, I would like to request sick leave starting today.\n\nI will keep you updated on my condition and hope to return to work as soon as I am able. Thank you for your understanding.\n\nBest regards,\n\n[Your Name]  \n[Your Position]  \n[Your Contact Information]",
+    "score": 0.6905
+  },
+  {
+    "id": "dd875c51",
+    "timestamp": "2026-04-09T02:20:45.810472",
+    "prompt": "security issue",
+    "intent": "complaint",
+    "tone": "professional",
+    "output": "Subject: Concern Regarding Security Issues\n\nDear [Recipient's Name],\n\nI hope this message finds you well. I am writing to bring to your attention a security issue that has recently come to my notice. It appears that there have been some lapses in our current security protocols that could potentially compromise the safety of our sensitive information.\n\nI have observed [briefly describe the specific issue or incidents, e.g., unauthorized access attempts, outdated software, etc.], which raises concerns about our overall security posture. Given the importance of safeguarding our data, I believe it is crucial to address these issues promptly.\n\nI kindly suggest that we review our security measures and consider implementing additional safeguards or updates to prevent any potential breaches. I would appreciate the opportunity to discuss this matter further and explore possible solutions together.\n\nThank you for your attention to this important issue. I look forward to your response.\n\nBest regards,\n\n[Your Name]  \n[Your Position]  \n[Your Contact Information]  \n[Your Company]",
+    "score": 0.925
+  },
+  {
+    "id": "ca491d2c",
+    "timestamp": "2026-04-09T02:15:03.555747",
+    "prompt": "Respond to below email.\n\nEmail: mike grigsby is having problems with accessing the west power site. can you please make sure he has an active password.",
+    "intent": "compose",
+    "tone": "professional",
+    "output": "Subject: Re: Access Issues for Mike Grigsby\n\nHi Phillip,\n\nThank you for bringing this to my attention. I will check Mike Grigsby's account and ensure he has an active password for the West Power site. I\u2019ll follow up with him once it\u2019s resolved.\n\nBest regards,  \n[Your Name]",
+    "score": 0.7676
+  },
+  {
+    "id": "0f973a88",
+    "timestamp": "2026-04-09T02:14:00.424713",
+    "prompt": "mike grigsby is having problems with accessing the west power site. can you please make sure he has an active password.",
+    "intent": "compose",
+    "tone": "professional",
+    "output": "Subject: Access Issue for Mike Grigsby\n\nHi [Recipient's Name],\n\nI hope this message finds you well. I wanted to bring to your attention that Mike Grigsby is currently experiencing issues accessing the West Power site. Could you please verify that he has an active password?\n\nThank you for your assistance.\n\nBest regards,  \n[Your Name]  \n[Your Position]  \n[Your Contact Information]",
+    "score": 0.9484
+  },
+  {
+    "id": "f5822af0",
+    "timestamp": "2026-04-09T02:09:27.629249",
+    "prompt": "generate professional email to schedule a meeting",
+    "intent": "compose",
+    "tone": "formal",
+    "output": "Subject: Request to Schedule a Meeting\n\nDear [Recipient's Name],\n\nI hope this message finds you well. I am writing to propose a meeting to discuss [briefly state the purpose or topic of the meeting]. I believe that a face-to-face conversation would be beneficial in addressing [specific points or objectives].\n\nCould you please let me know your availability over the next week? I am flexible and willing to accommodate your schedule as best as I can. \n\nThank you for considering this request. I look forward to your response.\n\nBest regards,\n\n[Your Name]  \n[Your Position]  \n[Your Company]  \n[Your Contact Information]",
+    "score": 0.7433
+  },
+  {
+    "id": "1918a85a",
+    "timestamp": "2026-04-09T01:55:06.411719",
+    "prompt": "write professional email to schedule a meeting\n",
+    "intent": "compose",
+    "tone": "formal",
+    "output": "Subject: Request to Schedule a Meeting\n\nDear [Recipient's Name],\n\nI hope this message finds you well. I am writing to propose a meeting to discuss [briefly state the purpose or topic of the meeting]. I believe a face-to-face conversation would be beneficial in addressing [mention any specific points or objectives].\n\nCould we schedule a time that works for you? I am available on [provide two or three options for dates and times], but I am more than willing to accommodate your schedule if these options do not suit you.\n\nThank you for considering this request. I look forward to your reply.\n\nBest regards,\n\n[Your Name]  \n[Your Position]  \n[Your Company]  \n[Your Phone Number]  \n[Your Email Address]",
+    "score": 0.8483
+  }
+]
